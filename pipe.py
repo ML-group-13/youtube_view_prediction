@@ -5,13 +5,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tempfile import TemporaryFile
+
+import validators
 import csv
+import cv2
+import urllib
 
 data_uk = pd.DataFrame(pd.read_csv("./data/GBvideos.csv", error_bad_lines=False))
-data_us = (pd.DataFrame(pd.read_csv("./data/USvideos.csv", error_bad_lines=False)))
+data_us = pd.DataFrame(pd.read_csv("./data/USvideos.csv", error_bad_lines=False))
 data = pd.concat([data_us, data_uk])
 
-print(data.columns)
+print("number of rows in data: " + str(data.shape[0]))
 
 likes = data[['likes', 'dislikes', 'comment_total']]
 views = data[['views']]
