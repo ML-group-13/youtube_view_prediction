@@ -10,7 +10,6 @@ data = pd.concat([data_us, data_uk])
 
 images = []
 thumbnails = data[['thumbnail_link']]
-thumbnails = thumbnails[:-15000]
 print(len(thumbnails))
 
 for i in range(0, len(thumbnails)):
@@ -21,9 +20,10 @@ for i in range(0, len(thumbnails)):
 		image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 		images.append(image)
 	except:
-		images.append(np.empty([1,1]))
-	if (i%1000 == 0) and (i > 0):
+		images.append('')
+	if len(images) == 1000:
 		print(i)
-		np.savez("data/images/images_" + str(i-1000) + "_" + str(i) + ".npz", images)
+		np.savez("data/images/images_" + str(i-999) + "_" + str(i+1) + ".npz", images)
 		images = []
 np.savez("data/images/images_" + str(15000) + "_" + str(15985) + ".npz", images)
+print(len(images))

@@ -12,14 +12,31 @@ import csv
 import cv2
 import urllib
 
+from os import listdir
+from os.path import isfile, join
+
+
 data_uk = pd.DataFrame(pd.read_csv("./data/GBvideos.csv", error_bad_lines=False))
 data_us = pd.DataFrame(pd.read_csv("./data/USvideos.csv", error_bad_lines=False))
 data = pd.concat([data_us, data_uk])
 
-print("number of rows in data: " + str(data.shape[0]))
+print("total number of rows in data: " + str(data.shape[0]))
+
+images_data = []
+
+for file in [f for f in listdir("./data/images") if isfile(join("./data/images", f))]:
+	images = np.load("./data/images/" + file, allow_pickle=True)
+	for image in images['arr_0']:
+		images_data.append(image)
+
+data['images'] = images_data
 
 likes = data[['likes', 'dislikes', 'comment_total']]
 views = data[['views']]
+
+data = data.loc[data['images'] != '']
+
+print("number of rows in cleaned data: " + str(data.shape[0]))
 
 data_dmatrix = xgb.DMatrix(data=likes,label=views)
 
