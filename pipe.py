@@ -59,7 +59,7 @@ if __name__ == "__main__":
     print("MSE: %.2f" % mse)
     print("RMSE: %.2f" % np.sqrt(mse))
 
-	# Visualize feature importance
+    # Visualize feature importance
     xgb.plot_importance(xgbr)
     plt.rcParams['figure.figsize'] = [5, 5]
     plt.show()
