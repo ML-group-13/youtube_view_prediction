@@ -23,5 +23,5 @@ $pip install scikit-learn
 $pip install numpy
 $pip install pandas
 $pip install matplotlib
-$pip install cv2
+$pip install opencv-python
 ```
