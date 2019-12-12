@@ -17,16 +17,19 @@ def read_in_data():
         "./data/USvideos.csv", error_bad_lines=False))
     data = pd.concat([data_us, data_uk])
 
+    print("read in data, will read in images")
     data['images'] = read_images()
     data = data.loc[data['images'] != '']
 
-    print("number of rows in cleaned data: " + str(data.shape[0]))
+    print("Data and images read and cleaned. Number of rows in cleaned data: " +
+          str(data.shape[0]))
     return data
 
 
 def read_images():
     images_data = []
     for file in [f for f in listdir("./data/images") if isfile(join("./data/images", f))]:
+        print("reading in: " + file)
         images = np.load("./data/images/" + file, allow_pickle=True)
         for image in images['arr_0']:
             images_data.append(image)
@@ -34,7 +37,7 @@ def read_images():
 
 if __name__ == "__main__":
     data = read_in_data()
-    features = data[['likes', 'dislikes', 'comment_total']]
+    features = data[['likes', 'dislikes', 'comment_count']]
     target = data[['views']]
 
     data_dmatrix = xgb.DMatrix(data=features, label=target)
