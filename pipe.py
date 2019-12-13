@@ -34,10 +34,12 @@ def read_images(development=False):
     print("started reading in images, this may take a few minutes")
     images_data = []
     for file in [f for f in listdir("./data/images") if isfile(join("./data/images", f))]:
-        if development and len(file.split("_")[1]) < 5:
-            images = np.load("./data/images/" + file, allow_pickle=True)
-            for image in images['arr_0']:
-                images_data.append(image)
+        if development and len(file.split("_")[1]) > 5:
+            continue
+        images = np.load("./data/images/" + file, allow_pickle=True)
+        for image in images['arr_0']:
+            images_data.append(image)
+
 
 
 if __name__ == "__main__":

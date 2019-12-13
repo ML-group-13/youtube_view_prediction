@@ -16,7 +16,7 @@ It is also possible to run in a development mode, this will use only 10 000 data
 $python pipe.py development
 ```
 
-To save images from thumbnails:
+To save images from thumbnails, this does not need to be done when the data is already present:
 ```
 $python save_images.py
 ```
