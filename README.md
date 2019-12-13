@@ -11,6 +11,11 @@ To run program:
 $python pipe.py
 ```
 
+It is also possible to run in a development mode, this will use only 10 000 data points:
+```
+$python pipe.py development
+```
+
 To save images from thumbnails:
 ```
 $python save_images.py

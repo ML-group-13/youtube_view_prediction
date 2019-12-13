@@ -28,6 +28,5 @@ for i in range(0, len(thumbnails)):
         np.savez("data/images/images_" + str(i - 999) +
                  "_" + str(i + 1) + ".npz", images)
         images = []
-np.savez("data/images/images_" + str(15000) +
-         "_" + str(15985) + ".npz", images)
-print(len(images))
+np.savez("data/images/images_" + str(79000) +
+         "_" + str(79865) + ".npz", images)

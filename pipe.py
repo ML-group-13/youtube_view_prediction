@@ -9,32 +9,48 @@ import matplotlib.pyplot as plt
 from os import listdir
 from os.path import isfile, join
 
+import sys
 
-def read_in_data():
+
+def read_in_data(development=False):
+    print("started reading in data")
     data_uk = pd.DataFrame(pd.read_csv(
         "./data/GBvideos.csv", error_bad_lines=False))
     data_us = pd.DataFrame(pd.read_csv(
         "./data/USvideos.csv", error_bad_lines=False))
     data = pd.concat([data_us, data_uk])
 
-    data['images'] = read_images()
+    if (development):
+        data = data[:10000]
+
+    data['images'] = read_images(development)
     data = data.loc[data['images'] != '']
 
     print("number of rows in cleaned data: " + str(data.shape[0]))
     return data
 
 
-def read_images():
+def read_images(development=False):
+    print("started reading in images, this may take a few minutes")
     images_data = []
     for file in [f for f in listdir("./data/images") if isfile(join("./data/images", f))]:
-        images = np.load("./data/images/" + file, allow_pickle=True)
-        for image in images['arr_0']:
-            images_data.append(image)
+        if development and len(file.split("_")[1]) < 5:
+            images = np.load("./data/images/" + file, allow_pickle=True)
+            for image in images['arr_0']:
+                images_data.append(image)
 
 
 if __name__ == "__main__":
-    data = read_in_data()
-    features = data[['likes', 'dislikes', 'comment_total']]
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "development":
+            print("running in development mode")
+            data = read_in_data(development=True)
+        else:
+            data = read_in_data()
+    else:
+        data = read_in_data()
+
+    features = data[['likes', 'dislikes', 'comment_count']]
     target = data[['views']]
 
     data_dmatrix = xgb.DMatrix(data=features, label=target)
