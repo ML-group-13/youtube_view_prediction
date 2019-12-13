@@ -1,3 +1,4 @@
 **.csv
 **.npz
-/data
+data/
+/data/
