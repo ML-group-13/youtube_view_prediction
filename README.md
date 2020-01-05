@@ -11,7 +11,13 @@ To run program:
 $python pipe.py
 ```
 
-To save images from thumbnails:
+It is also possible to run in a development mode, this will use 10 000 data points by default or the amount used as input: 
+```
+$python pipe.py development
+$python pipe.py development 1000
+```
+
+To save images from thumbnails, this does not need to be done when the data is already present:
 ```
 $python save_images.py
 ```
