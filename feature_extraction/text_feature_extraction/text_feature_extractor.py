@@ -1,9 +1,9 @@
 import re
+from progress.bar import ChargingBar
 import string 
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk import tokenize
 from feature_extraction.text_feature_extraction.clickbait_detector.src.detect import Predictor
-
 
 class TextFeatureExtractor:
 
@@ -19,7 +19,9 @@ class TextFeatureExtractor:
         clickbait_predictor = Predictor()
         title_word_count = []
         title_number_count = []
+        bar = ChargingBar('Processing Text:\t\t', max=len(df['title']))
         for idx, title in df['title'].items():
+            bar.next()
             title_length.append(self.text_length(title))
             title_capitals_count.append(self.capitals_count(title))
             title_capitals_ratio.append(self.capitals_ratio(title))
@@ -30,6 +32,7 @@ class TextFeatureExtractor:
             clickbait_predictions.append(clickbait_predictor.predict(title))
             title_word_count.append(self.word_count(title))
             title_number_count.append(self.number_count(title))
+        bar.finish()
         df['title_length'] = title_length
         df['title_capitals_count'] = title_capitals_count
         df['title_capitals_ratio'] = title_capitals_ratio
