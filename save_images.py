@@ -4,10 +4,15 @@ import numpy as np
 import urllib
 import cv2
 
+if 1:
+    HD = "HD"
+else:
+    HD = ""
+
 data_uk = pd.DataFrame(pd.read_csv(
-    "./data/GBvideos.csv", error_bad_lines=False))
+    "./data/GBvideos" + HD + ".csv", error_bad_lines=False))
 data_us = pd.DataFrame(pd.read_csv(
-    "./data/USvideos.csv", error_bad_lines=False))
+    "./data/USvideos" + HD + ".csv", error_bad_lines=False))
 data = pd.concat([data_us, data_uk])
 
 images = []
@@ -25,8 +30,8 @@ for i in range(0, len(thumbnails)):
         images.append('')
     if len(images) == 1000:
         print(i)
-        np.savez("data/images/images_" + str(i - 999) +
+        np.savez("data/images" + HD + "/images_" + str(i - 999) +
                  "_" + str(i + 1) + ".npz", images)
         images = []
-np.savez("data/images/images_" + str(79000) +
+np.savez("data/images" + HD + "/images_" + str(79000) +
          "_" + str(79865) + ".npz", images)
