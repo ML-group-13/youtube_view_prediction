@@ -31,4 +31,6 @@ $pip install pandas
 $pip install matplotlib
 $pip install opencv-python
 $pip install nltk
+$pip install keras
+$pip install tensorflow
 ```
