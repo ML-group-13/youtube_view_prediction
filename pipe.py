@@ -50,7 +50,8 @@ if __name__ == "__main__":
             if len(sys.argv) == 3:
                 try:
                     data = read_in_data(
-                        development=True, datapoints=int(sys.argv[2]))
+                        development=True, datapoints=int(sys.argv[2])
+                    )
                 except ValueError:
                     data = read_in_data(development=True)
             else:
@@ -60,10 +61,19 @@ if __name__ == "__main__":
     else:
         data = read_in_data()
 
+    print("min view count: " + str(data['views'].min()) +
+          "  max view count: " + str(data['views'].max()))
+
+    # TODO: Maybe change the y_variable to log_views instead of views
+    # data['log_views'] = np.log(data['views'])
+
+    # data['views'].plot.hist(bins=100, alpha=0.5)
+    # data['log_views'].plot.hist(bins=100, alpha=0.5)
+
     data = TextFeatureExtractor().extract_features(data)
 
-    features = data[['title_length', 'title_capitals_count',
-                     'title_capitals_ratio', 'title_non_letter_count', 'title_non_letter_ratio']]
+    features = data[['clickbait_score', 'title_sentiment', 'title_sentiment_polarity', 'title_length', 'title_capitals_count',
+                     'title_capitals_ratio', 'title_non_letter_count', 'title_non_letter_ratio', 'title_word_count', 'category_id', 'title_number_count']]
     target = data[['views']]
 
     data_dmatrix = xgb.DMatrix(data=features, label=target)
@@ -71,7 +81,8 @@ if __name__ == "__main__":
     x_train, x_test, y_train, y_test = train_test_split(
         features, target, test_size=0.2, random_state=123)
 
-    xgbr = xgb.XGBRegressor(objective='reg:linear', colsample_bytree=0.3, learning_rate=0.1,
+    print("started analysis")
+    xgbr = xgb.XGBRegressor(objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
                             max_depth=5, alpha=10, n_estimators=10)
 
     xgbr.fit(x_train, y_train)
