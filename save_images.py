@@ -3,11 +3,18 @@ import numpy as np
 
 import urllib
 import cv2
+import sys
 
-if 1:
+if __name__ == "__main__":
     HD = "HD"
-else:
-    HD = ""
+    max_images = 80000
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "non-hd":
+            print("running in non-hd mode")
+            HD = ""
+        elif sys.argv[1].isdigit():
+            print("only saving the first " + sys.argv[1] + " images")
+            max_images = int(sys.argv[1])
 
 data_uk = pd.DataFrame(pd.read_csv(
     "./data/GBvideos" + HD + ".csv", error_bad_lines=False))
@@ -17,7 +24,7 @@ data = pd.concat([data_us, data_uk])
 
 images = []
 thumbnails = data[['thumbnail_link']]
-print(len(thumbnails))
+print("found " + str(len(thumbnails)) + " thumbnails")
 
 for i in range(0, len(thumbnails)):
     thumbnail = thumbnails.values[i][0]
@@ -33,5 +40,9 @@ for i in range(0, len(thumbnails)):
         np.savez("data/images" + HD + "/images_" + str(i - 999) +
                  "_" + str(i + 1) + ".npz", images)
         images = []
+    if i + 1 == max_images:
+        np.savez("data/images" + HD + "/images_" + str(i - len(images) + 1) +
+                 "_" + str(i + 1) + ".npz", images)
+        exit()
 np.savez("data/images" + HD + "/images_" + str(79000) +
          "_" + str(79865) + ".npz", images)

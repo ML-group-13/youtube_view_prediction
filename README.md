@@ -17,9 +17,11 @@ $python pipe.py development
 $python pipe.py development 1000
 ```
 
-To save images from thumbnails, this does not need to be done when the data is already present:
+To save hd images from thumbnails run the save_images file. It is also possible to only save a number of images or save non-hd versions. The image features will not perform well without hd images. Images only need to be saved when the data is not already present:
 ```
 $python save_images.py
+$python save_images.py 3000
+$python save_images.py non-hd
 ```
 
 To install all required packages:
