@@ -91,7 +91,7 @@ if __name__ == "__main__":
     data = ImageFeatureExtractor().extractImageFeatures(data) 
     
     features = data[[
-                     'clickbait_score', 'title_sentiment', 'title_sentiment_polarity',
+                     'title_sentiment', 'title_sentiment_polarity',
                      'title_length', 'title_capitals_count',
                      'title_capitals_ratio', 'title_non_letter_count', 'title_non_letter_ratio',
                      'title_word_count', 'category_id', 'title_number_count',
