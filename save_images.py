@@ -36,13 +36,14 @@ for i in range(0, len(thumbnails)):
     except:
         images.append('')
     if len(images) == 1000:
-        print(i)
+        print(i + 1)
         np.savez("data/images" + HD + "/images_" + str(i - 999) +
                  "_" + str(i + 1) + ".npz", images)
         images = []
     if i + 1 == max_images:
-        np.savez("data/images" + HD + "/images_" + str(i - len(images) + 1) +
-                 "_" + str(i + 1) + ".npz", images)
+        if len(images) > 0:
+            np.savez("data/images" + HD + "/images_" + str(i - len(images) + 1) +
+                     "_" + str(i + 1) + ".npz", images)
         exit()
 np.savez("data/images" + HD + "/images_" + str(79000) +
          "_" + str(79865) + ".npz", images)

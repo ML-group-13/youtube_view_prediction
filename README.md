@@ -24,7 +24,7 @@ $python save_images.py 3000
 $python save_images.py non-hd
 ```
 
-To install all required packages:
+To install all required packages, make sure cmake is installed before dlib and face_recognition:
 ```
 $pip install xgboost
 $pip install scikit-learn
@@ -35,4 +35,9 @@ $pip install opencv-python
 $pip install nltk
 $pip install keras
 $pip install tensorflow
+$pip install progress
+$pip install cmake
+$pip install dlib
+$pip install face_recognition
+$pip install scikit-image
 ```
