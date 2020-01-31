@@ -73,12 +73,12 @@ def k_fold_test(features, target, xgbr_model, k=5):
 
         predictions_train = xgbr_model.predict(x_train)
         mse = mean_squared_error(y_train, predictions_train)
-        train_rmse_percent.append(np.sqrt(mse) / mean(target['views']) * 100)
+        train_rmse_percent.append(np.sqrt(mse) / mean(target['log_views']) * 100)
         train_rmse.append(np.sqrt(mse))
 
         predictions_test = xgbr_model.predict(x_test)
         mse = mean_squared_error(y_test, predictions_test)
-        test_rmse_percent.append(np.sqrt(mse) / mean(target['views']) * 100)
+        test_rmse_percent.append(np.sqrt(mse) / mean(target['log_views']) * 100)
         test_rmse.append(np.sqrt(mse))
 
     return ((mean(train_rmse), mean(train_rmse_percent)), (mean(test_rmse), mean(test_rmse_percent)))
@@ -104,10 +104,12 @@ if __name__ == "__main__":
 
     start_time = int(time.time())
     # TODO: Maybe change the y_variable to log_views instead of log_views
-    # data['log_views'] = np.log(data['views'])
 
     # data['views'].plot.hist(bins=100, alpha=0.5)
     # data['log_views'].plot.hist(bins=100, alpha=0.5)
+    data['log_views'] = np.log(data[['views']])
+
+    print(data.head())
 
     data = TextFeatureExtractor().extract_features(data)
     data = ImageFeatureExtractor().extractImageFeatures(data)
@@ -130,11 +132,12 @@ if __name__ == "__main__":
     text_features = data[text_features_names]
     image_features = data[image_features_names]
 
-    features = [text_features, image_features]
+    features = [total_features, text_features, image_features]
     names_per_feature = [total_features_names,
     text_features_names, image_features_names]
     feature_names = ["text features", "image features"]
-    target = data[['views']]
+
+    target = data[['log_views']]
 
     file = open('./results/results_' + str(int(time.time())) + '.csv', 'w')
     with file:
@@ -143,8 +146,8 @@ if __name__ == "__main__":
                          "train_rmse", "train_rmse_percent", "test_rmse", "test_rmse_percent"])
         for i in range(0, len(features)):
             print("\nFitting model with " + feature_names[i])
-            # depths = [3, 5, 7, 9, 11]
-            depths = [9, 11]
+            # depths = [1, 3, 5, 7, 9, 11]
+            depths = [7]
             n_estimators = [10, 50, 100, 250, 400]
             colsamples_bytree = [0.25, 0.5, 0.75]
             learning_rates = [0.01, 0.05, 0.1]
