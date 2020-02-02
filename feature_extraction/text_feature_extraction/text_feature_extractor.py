@@ -8,6 +8,7 @@ from nltk import tokenize
 class TextFeatureExtractor:
 
     def extract_features(self, df):
+        ''' Extracts the features for the text.'''
         title_length = []
         title_capitals_count = []
         title_capitals_ratio = []
@@ -42,22 +43,28 @@ class TextFeatureExtractor:
         return df
 
     def text_length(self, text):
+        ''' Calculates the length of text'''
         return len(text)
 
     def capitals_count(self, text):
+        ''' Counts the number of capitals'''
         return sum(1 for c in text if c.isupper())
 
     def capitals_ratio(self, text):
+        ''' Calculates the number of capitals compared to all letters'''
         return self.capitals_count(text) / self.text_length(text)
 
     def non_letter_count(self, text):
+        ''' Calculates the number of non letters (so numbers and punctuation)'''
         letters_and_space_regex = re.compile('[^a-zA-Z ]')
         return len(re.findall(letters_and_space_regex, text))
 
     def non_letter_ratio(self, text):
+        ''' Calculates the ratio of non letters'''
         return self.non_letter_count(text) / self.text_length(text)
 
     def sentiment(self, text):
+        ''' Calculates the sentiment of the text using nltk sentiment analyzer'''
         lines_list = tokenize.sent_tokenize(text)
         sid = SentimentIntensityAnalyzer()
         sent = 0
@@ -68,7 +75,9 @@ class TextFeatureExtractor:
         return ((sent / len(lines_list)), (sent_pol / len(lines_list)))
 
     def word_count(self, text):
+        ''' Counts the number of words'''
         return sum([i.strip(string.punctuation).isalpha() for i in text.split()])
 
     def number_count(self, text):
+        ''' Counts the number of numbers'''
         return sum(character.isdigit() for character in text)

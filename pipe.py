@@ -10,20 +10,19 @@ from statistics import mean
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-from sklearn.feature_selection import SelectFromModel
 import pandas as pd
 import numpy as np
-from numpy import sort
 
 from feature_extraction.text_feature_extraction.text_feature_extractor import TextFeatureExtractor
 from feature_extraction.image_feature_extraction.image_feature_extractor import ImageFeatureExtractor
 
 
-# WARNINGS
+# Ignore warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
-def read_in_data(development=False, datapoints=10000):
+def read_in_data(development=False, datapoints=5000):
+    ''' Reads in the data located in the data map. Uses 5000 datapoints in development mode.'''
     data_uk = pd.DataFrame(pd.read_csv(
         "./data/GBvideos.csv", error_bad_lines=False))
     data_us = pd.DataFrame(pd.read_csv(
@@ -39,7 +38,8 @@ def read_in_data(development=False, datapoints=10000):
     return data
 
 
-def read_images(development=False, datapoints=10000):
+def read_images(development=False, datapoints=5000):
+    ''' Reads in the images located in the data/imagesHD map. Uses 5000 datapoints in development mode.'''
     images_data = []
 
     for file in [f for f in listdir("./data/imagesHD") if (isfile(join("./data/imagesHD", f)))]:
@@ -61,6 +61,11 @@ def read_images(development=False, datapoints=10000):
 
 
 def k_fold_test(features, target, xgbr_model, k=5):
+    ''' Performs a k-fold cross validation. By default uses 5-fold.
+    Performance of a single fit will be measured by the root of the mean squared error 
+    and the percentage of the mean log_views.
+    The performance of the model will be avereged over the number of fits.
+    '''
     train_rmse = []
     test_rmse = []
     train_rmse_percent = []
@@ -73,18 +78,23 @@ def k_fold_test(features, target, xgbr_model, k=5):
 
         predictions_train = xgbr_model.predict(x_train)
         mse = mean_squared_error(y_train, predictions_train)
-        train_rmse_percent.append(np.sqrt(mse) / mean(target['log_views']) * 100)
+        train_rmse_percent.append(
+            np.sqrt(mse) / mean(target['log_views']) * 100)
         train_rmse.append(np.sqrt(mse))
 
         predictions_test = xgbr_model.predict(x_test)
         mse = mean_squared_error(y_test, predictions_test)
-        test_rmse_percent.append(np.sqrt(mse) / mean(target['log_views']) * 100)
+        test_rmse_percent.append(
+            np.sqrt(mse) / mean(target['log_views']) * 100)
         test_rmse.append(np.sqrt(mse))
 
     return ((mean(train_rmse), mean(train_rmse_percent)), (mean(test_rmse), mean(test_rmse_percent)))
 
 
 if __name__ == "__main__":
+    ''' Reads in the data, then calls the feature extractors. 
+    It will then perform the k-fold cross validation for different model configurations
+    and write the results to a csv file'''
     if len(sys.argv) > 1:
         if sys.argv[1] == "development":
             # print("running in development mode")
@@ -103,24 +113,18 @@ if __name__ == "__main__":
         data = read_in_data()
 
     start_time = int(time.time())
-    # TODO: Maybe change the y_variable to log_views instead of log_views
-
-    # data['views'].plot.hist(bins=100, alpha=0.5)
-    # data['log_views'].plot.hist(bins=100, alpha=0.5)
     data['log_views'] = np.log(data[['views']])
-
-    print(data.head())
 
     data = TextFeatureExtractor().extract_features(data)
     data = ImageFeatureExtractor().extractImageFeatures(data)
     text_features_partly = ['title_sentiment', 'title_sentiment_polarity',
-                           'title_length', 'title_capitals_count',
-                           'title_capitals_ratio', 'title_non_letter_count', 'title_non_letter_ratio',
-                           'title_word_count', 'title_number_count']
+                            'title_length', 'title_capitals_count',
+                            'title_capitals_ratio', 'title_non_letter_count', 'title_non_letter_ratio',
+                            'title_word_count', 'title_number_count']
     image_features_partly = ['image_amount_of_faces', 'image_text',
-                            'image_emotions_angry', 'image_emotions_sad', 'image_emotions_neutral',
-                            'image_emotions_disgust', 'image_emotions_surprise', 'image_emotions_fear',
-                            'image_emotions_happy']
+                             'image_emotions_angry', 'image_emotions_sad', 'image_emotions_neutral',
+                             'image_emotions_disgust', 'image_emotions_surprise', 'image_emotions_fear',
+                             'image_emotions_happy']
     general_features_partly = ['category_id']
 
     total_features_names = text_features_partly + \
@@ -134,8 +138,8 @@ if __name__ == "__main__":
 
     features = [total_features, text_features, image_features]
     names_per_feature = [total_features_names,
-    text_features_names, image_features_names]
-    feature_names = ["text features", "image features"]
+                         text_features_names, image_features_names]
+    feature_names = ["total_features", "text features", "image features"]
 
     target = data[['log_views']]
 
@@ -147,7 +151,7 @@ if __name__ == "__main__":
         for i in range(0, len(features)):
             print("\nFitting model with " + feature_names[i])
             # depths = [1, 3, 5, 7, 9, 11]
-            depths = [7]
+            depths = [3]
             n_estimators = [10, 50, 100, 250, 400]
             colsamples_bytree = [0.25, 0.5, 0.75]
             learning_rates = [0.01, 0.05, 0.1]
@@ -188,4 +192,4 @@ if __name__ == "__main__":
         print("Best configuration with RMSE of: {}    Depth: {:4d}, n_estimators: {:4d}, colsample_bytree: {:10.2f}, learning rate: {:10.2f}, alpha: {:4d}, features: {:4d}"
               .format(best_model[0], best_model[1][0], best_model[1][1], best_model[1][2], best_model[1][3], best_model[1][4], best_model[1][5]))
         print("Running the program took {} seconds ({} minutes)"
-            .format(int(time.time) - start_time, int((int(time.time) - start_time) / 60)))
+              .format(int(time.time) - start_time, int((int(time.time) - start_time) / 60)))
