@@ -61,6 +61,9 @@ class ImageFeatureExtractor:
         return len(face_locations)
 
     def text_detect(self, img, ele_size=(8,2)): #
+        # Copyright (c) 2015 qzane
+        # All rights reserved.
+        
         if len(img.shape)==3:
             img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         img_sobel = cv2.Sobel(img,cv2.CV_8U,1,0)
