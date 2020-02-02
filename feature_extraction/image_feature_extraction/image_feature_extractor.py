@@ -27,12 +27,14 @@ class ImageFeatureExtractor:
         image_emotions_fear = []
         image_emotions_happy = []
         bar = ChargingBar('Processing Images:\t\t', max=len(data['images']))
+        # For all the images in the dataset.
         for idx, image in data['images'].items():
             bar.next()
             image_amount_of_faces.append(self.detect_faces_amount(image))
             image_text.append(self.text_detect(image))
             emotions = self.detect_emotions(image)
             cnt = Counter()
+            # Count the amount of emotions present in the image.
             for word in emotions:
                 cnt[word] += 1
             image_emotions_angry.append(cnt['Angry'])
@@ -54,12 +56,14 @@ class ImageFeatureExtractor:
         data['image_emotions_happy'] = image_emotions_happy
         return data
 
+    # Based on the facial_recognition library by Ageitgey: https://github.com/ageitgey/face_recognition
     def detect_faces_amount(self, image):
         img = Image.fromarray(image, 'RGB')
         pic = np.array(img)
         face_locations = face_recognition.face_locations(pic)
         return len(face_locations)
 
+    # Based on the algorithm by qzane: https://github.com/qzane/text-detection
     def text_detect(self, img, ele_size=(8,2)): #
         # Copyright (c) 2015 qzane
         # All rights reserved.
@@ -79,6 +83,7 @@ class ImageFeatureExtractor:
         RectP = [(int(i[0]-i[2]*0.08),int(i[1]-i[3]*0.08),int(i[0]+i[2]*1.1),int(i[1]+i[3]*1.1)) for i in Rect]
         return len(RectP)
 
+    # Based on the model by Priya-Dwivedi: https://github.com/priya-dwivedi/face_and_emotion_detection
     def detect_emotions(self, image):
         emotions = []
         img = Image.fromarray(image, 'RGB')
@@ -87,11 +92,13 @@ class ImageFeatureExtractor:
         if(len(face_locations) > 0):
             face_images = {}
             for j in range(len(face_locations)):
+                # Crop and resize the image so that it will fit with the model.
                 top, right, bottom, left = face_locations[j]
                 face_images[j] = pic[top:bottom, left:right]
                 face_image = cv2.resize(face_images[j], (48,48))
                 face_image = cv2.cvtColor(face_image, cv2.COLOR_BGR2GRAY)
                 face_image = np.reshape(face_image, [1, face_image.shape[0], face_image.shape[1], 1])
+                # Compare the current face to the model.
                 predicted_class = np.argmax(model.predict(face_image))
                 label_map = dict((v,k) for k,v in emotion_dict.items()) 
                 predicted_label = label_map[predicted_class]
